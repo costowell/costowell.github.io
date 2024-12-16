@@ -1,0 +1,13 @@
+* Hello, I'm Cole! 👋
+
+I'm currently enrolled at Rochester Institute of Technology 🐯 working towards a Bachelor's in Computer Science 🖥️.
+
+I love hard problems and solving them even more.
+
+I'm passionate about low-level programming in languages like **C** and **Rust**.
+
+I've gotten very good at building full-stack applications with a variety of languages, frameworks, and databases.
+
+In my spare time I like to lift heavy things 🏋️‍♂️ and read math books 📚.
+
+If you're curious what I'm up to, check out some of my [[/posts][]]. You might find something you like!
