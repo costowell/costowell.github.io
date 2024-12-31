@@ -8,26 +8,35 @@ mathjax: true
 
 
 * Linear Systems with Negated Equations
-Recently, I did what few ever do at RIT and checked out two books from the library:
+Recently, I did what few CS majors ever do at RIT and checked out two books from the library:
 /@@html:<a href="https://archive.org/details/settheoryabstrac0000blyt" target="_blank">Set theory and abstract algebra</a>@@/ by Thomas Scott Blyth
 and
 /@@html:<a href="https://link.springer.com/book/9780387908922" target="_blank">Topology</a>@@/ by Klaus Jänich.
 I had wanted, and still want to, understand the mathematics of topology,
 but after reading the first chapter, I realized that I needed to brush up on my set theory before I continued.
 So, I went through the first chapter in /Set theory and abstract algebra/, and
-wondered if I could write a simple theorem prover. I had read about SMT solvers in a paper a friend recommended,
+wondered if I could write a simple theorem prover to do these exercises for me.
+I had read about SMT solvers in a paper a friend recommended,
 but my experience with automated proof ended there. Needless to say, I did not expect to make any breakthroughs,
 but I was still optimistic I could come up with something vaguely interesting.
 
 However, this article isn't about the theorem proving, its about the interesting problem of equation consistency.
 
 ** Framing the Problem
-I made a tiny grammar with a few essential logical operators, and then made a brute-force SAT solver.
-I wanted to go a step further and replace the predicates (boolean variables) with equations because equations have some condition to their truth.
+I wrote a tiny programming language to express boolean equations like
+- =A & B= means "A and B"
+- =(A | !B) -> C= means "if A or not B then C"
 
-For example, we know that $P \land Q$ is only ever true when the predicates $P$ and $Q$ are true.
-But, what if $P$ is described by the equation $x = 1$ and $Q$ is described by the equation $x = 2$?
-The expression $P \land Q$ would be /never satisfiable under any condition/ because $x$ can't equal 1 and 2 at the same time.
+Each of these variables is a boolean value and my program would find the values which made the whole statement true.
+This is commonly known as a [[https://en.wikipedia.org/wiki/SAT_solver][SAT Solver]].
+
+The next thing I wanted to do was replace these boolean variables with /equations/.
+This adds an interesting problem because there can be a boolean solution which contradicts itself.
+
+For example, if we had the expression =A & B=, the only solution is when =A= and =B= are both true.
+However, if we changed the expression to be =(x = 1) & (x = 2)=, both =x = 1= and =x = 2= has to be true to satisfy the boolean expression,
+but they obviously can't be true at the same time.
+Since the only possible solution gives a contradiction, there are no possible solutions for the expression and is therefore /unsatisfiable/.
 
 So what if we have 10, 1000, or 1058515 equations? How do we prove they're all consistent?
 Thankfully, I had just about wrapped up a semester of Linear Algebra so the first thought that came to my mind was *put it in a matrix!*
@@ -36,17 +45,14 @@ By manipulating the rows, we can find what values each variable can have that sa
 Usually when manipulating the rows, we want it to be in Reduced Row Echelon Form.
 This is putting the system in its most simple form so that redundant equations get removed and we can see simpler relationships between the variables.
 
-But one critical constraint makes this much more interesting than putting it in a matrix: negated equations.
+But one critical constraint makes this much more interesting: negated equations.
 Negated equations are equations that say something /is not equal/ to something.
-Matrices don't account for what is not equal, only what is equal.
+If our expression was =!A & B= then the only solution is when =A= is false and =B= is true.
+By using the same equations our expression will be ~(x != 1) & (x = 2)~.
+Of course, this expression is trivially true.
+The problem is that we can't put negated equations in a matrix, so for more complicated expressions and equations, how do we ensure that there are no contradictions?
 
-Lets use the same expression as above, but $P \colon x = y$ and $Q \colon x \ne y$.
-Clearly, both can't be true at the same time, so $P \land Q$ is unsatisfiable.
-You might be thinking, why can't we "pull out the negative"?
-That is to say, $P \colon x = y$, $Q \colon x = y$, and our equivalent expression is $P \land \lnot Q$.
-Now the only possibly valid solution is when $P$ is true and $Q$ is false, which still gives us the same problem because $Q$ being false means $x \ne y$.
-
-We need to develop process that takes into account these negated equations.
+We need to develop process that takes these negated equations into account.
 
 ** Attempt 1: The first of many
 I initially started with the following process.
@@ -107,7 +113,7 @@ Since there are no equivalence classes that contain $a$ or $c$ yet, we create a 
 $C_1 = \{ a, c \}$
 
 The second row in our RREF matrix says $b - c = 0$ which means $b = c$.
-Since $c$ already exists in an equivalence class, $b$ is added to it like so.
+Since $c$ already exists in an equivalence class, $b$ is added to it.
 
 $C_1 = \{ a, c, b \}$
 
@@ -153,7 +159,7 @@ Therefore, according to this method, a is not equal to b.
 *No!* I realize that we could have gotten $a = 1 - c$ and $b = 1 - c$ which would have our equivalence classes line up.
 
 *However*, equation comparison and equivalence class generation seem like a lot of guess work that is computationally expensive.
-Also, equivalence classes seemed to substitute the function of a matrix anyways so I decided to pivot towards using matrices more.
+Also, equivalence classes seemed to substitute the function of a matrix, so I decided to pivot towards using matrices more.
 
 
 ** Attempt 2: Close, but no cigar
@@ -218,7 +224,7 @@ $a = 1$, $c \ne 3$
 
 $c = 3$ is obviously consistent with $a = 1$. By the logic above, $c \ne 3$ is inconsistent. But nothing is said about $c$ by $a = 1$, so $c \ne 3$ is totally plausible!
 This principle happens to extend to any negated equation which talks about more variables than is in the system of positive equations.
-More specifically, the variables in a negated equation *must be a subset* of the variables in the system to potentially contradict, otherwise its always consistent.
+More specifically, the variables in a negated equation *must be a subset* of the variables in the system to potentially contradict, otherwise it's always consistent.
 
 That was pretty general and probably hard to follow so here's an example.
 Given the equation $a = b$, the negated equation $c \ne a + b$ is consistent with $a = b$ because $c$ could be anything.
@@ -244,7 +250,7 @@ To prove my observation, I decided to go with the very thing that started this j
 *** Equation Sets and a Set Theory Refresher
 
 I first started with the idea that equations can be modeled as a *set of points* which I'll be referring to as *equation sets*.
-For example, $x = y$ could be described by a set of tuples that look like $(1,1)$, $(-17,-17)$, $(5919, 5919)$, etc., in the form $(x, y)$.
+For example, $x = y$ could be described by a set of points that look like $(1,1)$, $(-17,-17)$, $(5919, 5919)$, etc., in the form $(x, y)$.
 
 With this idea, we can say the *intersection of two equation sets* is the solution to the system of the two coresponding equations.
 For example, consider the following equations where $A$ and $B$ are equation sets.
@@ -261,10 +267,10 @@ If the intersection of two equation sets is nothing, then there is no solution! 
 So, how do we describe a negated equation? To get a *negated equation set*, you take the *complement of an equation set*.
 For the uninitiated, the complement of a set is *everything not in the set*.
 If everything in an equation set is a valid solution to the equation, then everything not in the set is an invalid solution.
-By switching a statement from equals to not equals, you're basically saying "all valid solutions are invalid and all invalid solutions are valid".
+By switching a statement from equals to not equals, you're basically saying "all valid solutions are now invalid and all invalid solutions are now valid".
 Combining these two ideas, we get the following.
 
-Given $A\colon x = y$, $B\colon x \ne y$, then $A = B^\complement$
+If $A$ and $B$ are equations sets described by $x = y$ and $x \ne y$ respectively, then $A = B^\complement$ and $A^\complement = B$.
 
 *** The Revelation
 What we want to know is: what does $A \cap B$ equal if $B$ is a negated equation?
@@ -275,7 +281,7 @@ If it doesn't make much sense, don't worry, just understand that it is universal
 
 $A - (A \cap B^\complement) = A \cap B$
 
-On its own, this equation isn't very interesting, but when $A \cap B$ is nothing...
+On its own, this equation isn't very interesting, but when $A \cap B$ is nothing (aka A and B contradict)...
 
 $A - (A \cap B^\complement) = \emptyset$
 
@@ -327,7 +333,7 @@ This means that a solution to the system still exists which means the equations 
 It's actually pretty easy to show this, we just need to
 @@html:<a href="https://c.tenor.com/mgdCIbwyj1MAAAAC/benson-regular-show.gif" target="_blank">break it down a bit</a>@@.
 
-If B and C are negated equations and A is a regular equation then we want to find if $A \cap B \cap C$ is empty or not to prove it's consistency.
+If $B$ and $C$ are negated equations and $A$ is a regular equation then we want to find if $A \cap B \cap C$ is empty or not to prove it's consistency.
 
 Luckily, there's a simple equivalence.
 
@@ -347,14 +353,12 @@ The final process is as follows.
    - If there is a contradiction, system is inconsistent
 3. Add the inverse of a negated equation to the system
 4. Solve for the RREF
-   - If the system remains the same...
-     - The negated equation *must* is inconsistent with the system
+   - If the system remains unchanged...
+     - The negated equation *must* be inconsistent with the system
      - One equation is inconsistent with the system, therefore the whole system is inconsistent!
    - If the system changes...
      - The negated equation might remove /some possible/ solutions to the system, but did not remove all of them, therefore its consistent!
      - Repeat steps 3 and 4 until all negated equations are verified as consistent
-
-
 
 ** Conclusion
 And there you have it!
