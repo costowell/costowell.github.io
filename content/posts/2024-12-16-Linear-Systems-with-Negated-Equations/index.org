@@ -1,6 +1,7 @@
 ---
 title: "Linear Systems with Negated Equations"
-date: 2024-12-16T17:08:30-05:00
+summary: In the pursuit of making a theorem proover, I devised a process to show a bunch of equations and negated equations agree with each other.
+date: 2024-12-31T17:08:30-05:00
 draft: false
 categories: ['math']
 math: true
