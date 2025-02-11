@@ -3,12 +3,11 @@ title: "Linear Systems with Negated Equations"
 summary: In the pursuit of making a theorem proover, I devised a process to show a bunch of equations and negated equations agree with each other.
 date: 2024-12-31T17:08:30-05:00
 draft: false
-categories: ['math']
+categories: ['Math']
 math: true
 ---
 
 
-* Linear Systems with Negated Equations
 Recently, I did what few CS majors ever do at RIT and checked out two books from the library:
 /@@html:<a href="https://archive.org/details/settheoryabstrac0000blyt" target="_blank">Set theory and abstract algebra</a>@@/ by Thomas Scott Blyth
 and
@@ -23,7 +22,7 @@ but I was still optimistic I could come up with something vaguely interesting.
 
 However, this article isn't about the theorem proving, its about the interesting problem of equation consistency.
 
-** Framing the Problem
+* Framing the Problem
 I wrote a tiny programming language to express boolean equations like
 - =A & B= means "A and B"
 - =(A | !B) -> C= means "if A or not B then C"
@@ -55,7 +54,7 @@ The problem is that we can't put negated equations in a matrix, so for more comp
 
 We need to develop process that takes these negated equations into account.
 
-** Attempt 1: The first of many
+* Attempt 1: The first of many
 I initially started with the following process.
 1. Put all positive (normal) equations in a matrix
 2. Solve for the Reduced Row Echelon Form (RREF)
@@ -65,7 +64,7 @@ I initially started with the following process.
    - If one is found, system is inconsistent because LHS should never equal RHS in a negated equation
    - If one isn't found, system is consistent
 
-*** Example
+** Example
 Lets use this to prove the following system is inconsistent.
 
 $a = b$, $b = c$, $a \ne c$
@@ -124,10 +123,10 @@ Suppose $a \ne c$ is true.
 According to our equivalence classes, a valid equivalent expression is $c \ne c$ because $a = c$.
 This is an obvious contradiction, therefore proving that the system is inconsistent! Hooray!
 
-*** So what's wrong?
+** So what's wrong?
 This seems like a good way of going about it, but equivalence classes sometimes don't make important connections and are also just plain inefficient when checking if an equation is equivalent to another.
 
-*** Counterexample
+** Counterexample
 Lets show where this method falls short. The following system is inconsistent, but our current process says it is consistent.
 
 $a + c = 1$, $b + c = 1$, $a \ne b$
@@ -156,14 +155,14 @@ $C_1 = \{ a + c, 1, b + c \}$
 In our negated equation, $a \ne b$, neither $a$ nor $b$ exist in an equivalence class.
 Therefore, according to this method, a is not equal to b.
 
-*** But what about...
+** But what about...
 *No!* I realize that we could have gotten $a = 1 - c$ and $b = 1 - c$ which would have our equivalence classes line up.
 
 *However*, equation comparison and equivalence class generation seem like a lot of guess work that is computationally expensive.
 Also, equivalence classes seemed to substitute the function of a matrix, so I decided to pivot towards using matrices more.
 
 
-** Attempt 2: Close, but no cigar
+* Attempt 2: Close, but no cigar
 My approach the second time around was to use the matrix to do a proof by contradiction.
 
 1. Put all positive equations in a matrix
@@ -179,7 +178,7 @@ My approach the second time around was to use the matrix to do a proof by contra
      - The inverse of the negated equation is consistent, which means the negated equation is inconsistent
      - Since one equation is inconsistent, the whole system is inconsistent
 
-*** Example
+** Example
 Let's take a quick look at how this would work.
 Here is the same system from before that broke the previous method:
 
@@ -216,7 +215,7 @@ Our only negated equation is $a \ne b$ and its inverse is $a = b$, making our ma
 Clearly, the inverse of our negated equation is consistent which means the system is inconsistent because the negated equation is inconsistent!
 This is exactly what we expect! Sadly, as the title of this section indicates, we're not quite there (but we're getting pretty close!).
 
-*** Counterexample
+** Counterexample
 The culprit lies in the logic determining if a negated equation is consistent.
 Suppose we want to check the consistency of a negated equation for variables which have /nothing/ to do with the system?
 For example:
@@ -241,14 +240,14 @@ $b = 1$ is consistent with $a = b$, so by the logic we established above, $b \ne
 
 We're inching closer, but this solution is also wrong.
 
-** Attempt 3: Third Time's the Charm
+* Attempt 3: Third Time's the Charm
 
 After having iterated on this idea for awhile, I began noticing /how/ the matrix changed when checking the consistency of a negated equation with the above method.
 
 I started to see some kind of correlation between the resulting matrix's rank (# of non-zero rows), but I wasn't satisfied with just a naive observation.
 To prove my observation, I decided to go with the very thing that started this journey: set theory!
 
-*** Equation Sets and a Set Theory Refresher
+** Equation Sets and a Set Theory Refresher
 
 I first started with the idea that equations can be modeled as a *set of points* which I'll be referring to as *equation sets*.
 For example, $x = y$ could be described by a set of points that look like $(1,1)$, $(-17,-17)$, $(5919, 5919)$, etc., in the form $(x, y)$.
@@ -273,7 +272,7 @@ Combining these two ideas, we get the following.
 
 If $A$ and $B$ are equations sets described by $x = y$ and $x \ne y$ respectively, then $A = B^\complement$ and $A^\complement = B$.
 
-*** The Revelation
+** The Revelation
 What we want to know is: what does $A \cap B$ equal if $B$ is a negated equation?
 We need to create an equation which relates $A \cap B$ to $A \cap B^\complement$ since we can only solve systems of normal/positive equations in a matrix.
 
@@ -293,12 +292,12 @@ we get this glorious, beautiful equation, revealing the final building block for
 /It is at this point that I must pause and encourage you, the reader, to understand the significance before I give it away./
 /However, if you're just here for a good time, then by all means, read on./
 
-**** What does it mean?
+*** What does it mean?
 
 This proves that if we add the inverse of a negated equation to the system and the system remains /unchanged/ ($A = A \cap B^\complement$)
 then the negated equation is *inconsistent with the system* ($A \cap B = \emptyset$).
 
-*** Lets show that counterexample who's boss!
+** Lets show that counterexample who's boss!
 
 $P\colon a = b$, $Q\colon a \ne 1$
 
@@ -330,7 +329,7 @@ To prove these are inconsistent, we must prove that the system doesn't change wh
 The starting and ending matrix are certainly different, so $P \ne P \cap Q^\complement$ which means $P \cap Q$ *cannot be* empty.
 This means that a solution to the system still exists which means the equations are consistent!
 
-*** What about multiple negated equations?
+** What about multiple negated equations?
 It's actually pretty easy to show this, we just need to
 @@html:<a href="https://c.tenor.com/mgdCIbwyj1MAAAAC/benson-regular-show.gif" target="_blank">break it down a bit</a>@@.
 
@@ -346,7 +345,7 @@ A \cap B \cap C & = A \cap (B \cap C) & [\ \text{wrap parenthesis}\ ] \\
 We can see that if $A \cap B$ or $A \cap C$ are empty then $A \cap B \cap C$ has to be empty too because the intersection of anything with an empty set is the empty set.
 
 
-*** To bring it all together!
+** To bring it all together!
 The final process is as follows.
 
 1. Put all positive equations in a matrix
@@ -361,7 +360,7 @@ The final process is as follows.
      - The negated equation might remove /some possible/ solutions to the system, but did not remove all of them, therefore its consistent!
      - Repeat steps 3 and 4 until all negated equations are verified as consistent
 
-** Conclusion
+* Conclusion
 And there you have it!
 I cannot express how much fun this was to solve! This whole thing started because of a book on set theory and ended with a satisfying solution thanks to sets!
 I couldn't be happier.
