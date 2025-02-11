@@ -1,0 +1,52 @@
+baseURL: 'https://stowell.dev/'
+title: Cole Stowell
+copyright: '&copy; Copyright 2024, Cole Stowell'
+theme: [PaperMod]
+
+enableInlineShortcodes: true
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+enableEmoji: true
+pygmentsUseClasses: true
+mainsections: ["posts", "papermod"]
+enableRobotsTXT: true
+relativeURLs: true
+
+languageCode: en-us
+
+pagination:
+  paperSize: 5
+
+menu:
+  main:
+    - identifier: posts
+      name: Posts
+      title: Posts
+      url: /posts/
+    - identifier: categories
+      name: Categories
+      title: Categories
+      url: /categories/
+params:
+  ShowShareButtons: true
+  ShowBreadCrumbs: true
+  profileMode:
+    enabled: true
+    subtitle: "Lover of Low Level Programming, Systems Design, and Math"
+    imageUrl: "images/avatar.png" # optional
+    imageTitle: "picture of Cole" # optional
+    imageWidth: 120 # custom size
+    imageHeight: 120 # custom size
+    buttons:
+      - name: Posts
+        url: "/posts/"
+      - name: Categories
+        url: "/categories/"
+
+  socialIcons: # optional
+    - name: "GitHub"
+      url: "https://github.com/costowell"
+    - name: "LinkedIn"
+      url: "https://www.linkedin.com/in/costowell"
