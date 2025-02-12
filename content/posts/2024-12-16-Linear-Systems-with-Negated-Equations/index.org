@@ -4,6 +4,7 @@ summary: In the pursuit of making a theorem proover, I devised a process to show
 date: 2024-12-31T17:08:30-05:00
 draft: false
 categories: ['Math']
+author: ["Cole Stowell"]
 math: true
 ---
 
