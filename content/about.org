@@ -1,7 +1,7 @@
 ---
 title: "About Me"
 draft: false
-categories: ['Low Level']
+categories: []
 ---
 
 {{< figure src="/images/avatar.png" width=256 title="Hello, I'm Cole! 👋" >}}
