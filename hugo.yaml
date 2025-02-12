@@ -29,6 +29,10 @@ menu:
       name: Categories
       title: Categories
       url: /categories/
+    - identifier: about
+      name: About Me
+      title: About Me
+      url: /about/
 params:
   ShowShareButtons: true
   ShowBreadCrumbs: true
@@ -40,6 +44,8 @@ params:
     imageWidth: 120 # custom size
     imageHeight: 120 # custom size
     buttons:
+      - name: About Me
+        url: "/about/"
       - name: Posts
         url: "/posts/"
       - name: Categories
