@@ -2,6 +2,9 @@
 title: "About Me"
 draft: false
 categories: []
+disableShare: true
+ShowReadingTime: false
+ShowBreadCrumbs: false
 ---
 
 {{< figure src="/images/avatar.png" width=256 title="Hello, I'm Cole! 👋" >}}
