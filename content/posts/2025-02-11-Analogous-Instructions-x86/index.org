@@ -78,7 +78,8 @@ Since this is an 3-bit field, there are 8 (2³) registers you can specify. Here'
 |                7 |             111 | edi      |
 
 
-The =R/M= field, you might have guessed, stands for @@html:<b>R</b>egister<b>/M</b>emory@@ and stores either a register or something to do with memory (3 bits is /way too small/ to store a memory location, but since we aren't dealing with memory in this article we won't get into how this field works).
+The =R/M= field, you might have guessed, stands for @@html:<b>R</b>egister<b>/M</b>emory@@ and stores either a register or
+{{< sidenote "something to do with memory">}}Careful readers might note that 3 bits is wayyyy too small to store a memory address. This field is used in combination with the <code>MOD</code> field to address memory.{{< /sidenote >}}.
 
 Finally, the =MOD= field stands for @@html:<b>mod</b>e@@ and stores the addressing mode.
 In combination with the R/M field, we can address memory in a variety of ways.
