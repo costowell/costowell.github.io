@@ -36,6 +36,9 @@ menu:
 params:
   ShowShareButtons: true
   ShowBreadCrumbs: true
+  ShowReadingTime: true
+  ShowFullTextinRSS: true
+  ShowRssButtonInSectionTermList: true
   profileMode:
     enabled: true
     subtitle: "Lover of Low Level Programming, Systems Design, and Math"
