@@ -6,5 +6,4 @@ categories: []
 author: ["Cole Stowell"]
 ---
 
-* init 3
 is anybody there? please ACK
