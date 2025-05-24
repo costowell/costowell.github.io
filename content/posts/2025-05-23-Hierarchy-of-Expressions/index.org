@@ -1,0 +1,90 @@
+---
+title: "The Cool Hierarchy of Expressions"
+summary: "Expressions in a programming language can be parsed and translated in a variety of ways"
+date: 2025-05-23T14:39:58-05:00
+draft: false
+categories: ['Compiling', 'Parsing']
+author: ["Cole Stowell"]
+---
+
+I've been working on a compiler in my spare time and have had a lot of fun hacking away for the past several months.
+I wanted to share some cool things about the expressions in my language, specifically how they're structured and evaluated.
+
+** Structure
+
+'Expression' is a pretty general term so /in general/ expressions represent, and therefore return, a value.
+They can look like =a + b * (c - 6)=, =a < b - 1 && f(a, b)=, or just =a=. So, where should we start?
+
+At the top-level, an expression is a *boolean expression*, *comparison expression*, or *arithmetic expression*.
+Boolean expressions each have their own *operation* (like =&&= or =||=) and at most two *operands*.
+These operands themselves can be top-level expressions which means we can chain boolean expressions like =A && (B || C)=.
+Additionally, these boolean operands can represent comparison and arithmetic operations which is
+where we'll get our =true= or =false= values from.
+
+Comparison expressions are very similar to boolean expressions: they have one operation and /exactly/ two operands.
+They look like ~a <= b~ or ~b != a~.
+The key difference is that the operands are arithmetic expressions.
+
+Which leads us to our final expression: the arithmetic expression.
+They look like =a / b + 6= or even just =a=. For the purposes of this post, this description is good enough.
+
+I hope you can see the pretty neat hierarchy which allows us to make /all kinds/ of expressions.
+But because there are so many kinds of expressions, the translation to runnable machine code gets a little more interesting.
+
+** Evaluation and Translation
+
+Take for example the arithmetic expression.
+When found on both sides of a comparison expression, the answer is simple: evaluate both sides as integers and then compare their results.
+
+But how do we evaluate our arithmetic expression if found at the top-level?
+
+The first example that comes to mind is a simple variable assignment.
+#+begin_src python
+myvar = a * 2 - 1
+#+end_src
+
+The answer is easy: evaluate =a * 2 - 1= as an integer and save it to =myvar=.
+
+But what if it were in a conditional statement instead?
+
+#+begin_src python
+if a * 2 - 1 {
+  # ...
+}
+#+end_src
+
+In this case, we need to evaluate this expression to a
+{{< sidenote "boolean value">}}Boolean values usually need to be evaluated to a series of conditional jumps in machine code{{< /sidenote >}}.
+
+If it's 0 then it's value is false, otherwise it's value is true.
+
+#+begin_src python
+if a * 2 - 1 != 0 {
+  # ...
+}
+#+end_src
+
+But wait there's more! What if we wanted to set a variable to a boolean expression?
+
+#+begin_src python
+in_range = a < b && b > c
+#+end_src
+
+We need to get the numeric result (1 or 0) into this variable by evaluating the expression.
+This might involve a transformation into something like the following.
+
+#+begin_src python
+in_range = 0
+if a < b && b > c {
+    in_range = 1
+}
+#+end_src
+
+** Conclusion
+
+Even though we parse these expressions the same way, the /translation/ to machine code is very contextual.
+So contextual that evaluating to both an integer and boolean value have different translations depending on what the top-level expression is.
+
+It was a lot of fun figuring this out, even more so implementing it!
+
+/Thanks for reading!/
